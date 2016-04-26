@@ -8,8 +8,7 @@ using boost::asio::ip::tcp;
 
 static std::uint64_t g_succeed_count = 0;
 
-template<size_t N>
-class session : public std::enable_shared_from_this<session<N>>
+class session : public std::enable_shared_from_this<session>
 {
 public:
 	session(tcp::socket socket)
@@ -26,7 +25,7 @@ private:
 	void do_read()
 	{
 		auto self(shared_from_this());
-		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), boost::asio::transfer_at_least(N), [this, self](boost::system::error_code ec, std::size_t length)
+		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), boost::asio::transfer_at_least(1), [this, self](boost::system::error_code ec, std::size_t length)
 		{
 			if (!ec)
 			{
@@ -56,7 +55,7 @@ private:
 	}
 
 	tcp::socket socket_;
-	enum { max_length = N };
+	enum { max_length = 1 };
 	char data_[max_length];
 };
 
@@ -78,7 +77,7 @@ private:
 		{
 			if (!ec)
 			{
-				std::make_shared<session<1>>(std::move(socket_))->start();
+				std::make_shared<session>(std::move(socket_))->start();
 			}
 
 			do_accept();
