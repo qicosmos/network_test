@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(network_test)
+project(network_test_server)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14")
@@ -26,7 +26,7 @@ set(SOURCE_FILES
 
 
 add_executable(network_test_server ${SOURCE_FILES})
-target_link_libraries(network_test ${EXTRA_LIBS})
+target_link_libraries(network_test_server ${EXTRA_LIBS})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_PACKAGE_VERSION_MAJOR "1")
