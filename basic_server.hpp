@@ -7,7 +7,7 @@
 
 using boost::asio::ip::tcp;
 
-static std::atomic<std::uint64_t> g_succeed_count = 0;
+static std::atomic<std::uint64_t> g_succeed_count(0);
 
 class session : public std::enable_shared_from_this<session>
 {
