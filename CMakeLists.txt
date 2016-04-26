@@ -25,7 +25,7 @@ set(SOURCE_FILES
 	)
 
 
-add_executable(network_test ${SOURCE_FILES})
+add_executable(network_test_server ${SOURCE_FILES})
 target_link_libraries(network_test ${EXTRA_LIBS})
 
 include (InstallRequiredSystemLibraries)
