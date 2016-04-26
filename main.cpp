@@ -9,7 +9,7 @@ int main()
 	{
 		boost::asio::io_service io_service;
 
-		basic_server s(io_service, 8090);
+		basic_server<1> s(io_service, 8090);
 
 		std::thread t([&io_service] {io_service.run(); });
 		t.detach();
