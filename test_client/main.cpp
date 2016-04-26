@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
 		tcp::socket s(io_service);
 		tcp::resolver resolver(io_service);
-		boost::asio::connect(s, resolver.resolve({ "127.0.0.1", "8090" }));
+		boost::asio::connect(s, resolver.resolve({ "192.168.2.183", "8090" }));
 
 		char request[max_length] = { 'a' };
 		size_t request_length = std::strlen(request);

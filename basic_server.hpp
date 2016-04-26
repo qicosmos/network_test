@@ -2,11 +2,12 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <atomic>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
 
-static std::uint64_t g_succeed_count = 0;
+static std::atomic<std::uint64_t> g_succeed_count = 0;
 
 class session : public std::enable_shared_from_this<session>
 {

@@ -20,7 +20,7 @@ int main()
 
 		while (true)
 		{
-			auto curr_succeed_count = g_succeed_count;
+			auto curr_succeed_count = g_succeed_count.load();
 			std::cout << curr_succeed_count - last_succeed_count << std::endl;
 			last_succeed_count = curr_succeed_count;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
