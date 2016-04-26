@@ -10,8 +10,12 @@ int main(int argc, char* argv[])
 		boost::asio::io_service io_service;
 		basic_server<1> s(io_service, 8090);
 		
-		std::thread t([&io_service] {io_service.run(); });
-		t.detach();
+		size_t num = std::atoi(argv[1]);
+		for (size_t i = 0; i < num; i++)
+		{
+			std::thread t([&io_service] {io_service.run(); });
+			t.detach();
+		}
 
 		getchar();
 
