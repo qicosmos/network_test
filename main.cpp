@@ -8,19 +8,8 @@ int main(int argc, char* argv[])
 	try
 	{
 		boost::asio::io_service io_service;
-		std::unique_ptr<base> ptr = nullptr;
-		int num = std::atoi(argv[1]);
-		if (num == 1)
-			 ptr = std::make_unique<basic_server<1>>(io_service, 8090);
-		else if(num == 2)
-			ptr = std::make_unique<basic_server<2>>(io_service, 8090);
-		else if (num == 3)
-			ptr = std::make_unique<basic_server<4>>(io_service, 8090);
-		else if (num == 4)
-			ptr = std::make_unique<basic_server<8>>(io_service, 8090);
-		else
-			ptr = std::make_unique<basic_server<500>>(io_service, 8090);
-
+		basic_server<1> s(io_service, 8090);
+		
 		std::thread t([&io_service] {io_service.run(); });
 		t.detach();
 
