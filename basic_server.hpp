@@ -27,7 +27,7 @@ private:
 	void do_read()
 	{
 		auto self(this->shared_from_this());
-		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), boost::asio::transfer_at_least(1), [this, self](boost::system::error_code ec, std::size_t length)
+		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), boost::asio::transfer_at_least(N), [this, self](boost::system::error_code ec, std::size_t length)
 		{
 			if (!ec)
 			{
@@ -48,8 +48,13 @@ private:
 	char data_[max_length];
 };
 
+struct base
+{
+	virtual ~base() {}
+};
+
 template<size_t N>
-class basic_server
+class basic_server : public base
 {
 public:
 	basic_server(boost::asio::io_service& io_service, short port)
