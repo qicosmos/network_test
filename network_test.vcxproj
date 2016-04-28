@@ -158,6 +158,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basic_server.hpp" />
+    <ClInclude Include="test_bridge.h" />
+    <ClInclude Include="test_delay.hpp" />
+    <ClInclude Include="test_qps.hpp" />
+    <ClInclude Include="unit_test.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

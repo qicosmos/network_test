@@ -18,10 +18,12 @@ int main(int argc, char* argv[])
 		boost::asio::connect(s, resolver.resolve({ "192.168.2.183", "8090" }));
 
 		char* request = new char[num];
+		request[0] = 'a';
 
 		while (true)
 		{
 			boost::asio::write(s, boost::asio::buffer(request, num));
+			boost::asio::read(s, boost::asio::buffer(request, num));
 		}
 
 		delete request;

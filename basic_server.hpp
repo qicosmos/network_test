@@ -32,6 +32,7 @@ private:
 			if (!ec)
 			{
 				//a successful request, can be used to statistic qps
+				socket_.send(boost::asio::buffer(data_, max_length));
 				g_succeed_count++;
 				do_read();
 			}
