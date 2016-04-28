@@ -48,18 +48,12 @@ private:
 	char data_[max_length];
 };
 
-struct base
-{
-	virtual ~base() {}
-};
-
 template<size_t N>
-class basic_server : public base
+class basic_server
 {
 public:
 	basic_server(boost::asio::io_service& io_service, short port)
-		: acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
-		socket_(io_service)
+		: acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), socket_(io_service)
 	{
 		do_accept();
 	}
