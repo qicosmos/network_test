@@ -27,12 +27,29 @@ private:
 	void do_read()
 	{
 		auto self(this->shared_from_this());
-		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), boost::asio::transfer_at_least(N), [this, self](boost::system::error_code ec, std::size_t length)
+		boost::asio::async_read(socket_, boost::asio::buffer(data_, max_length), [this, self](boost::system::error_code ec, std::size_t length)
 		{
 			if (!ec)
 			{
 				//a successful request, can be used to statistic qps
-				socket_.send(boost::asio::buffer(data_, max_length));
+				do_write();
+			}
+			else
+			{
+				//log
+				return;
+			}
+		});
+	}
+
+	void do_write()
+	{
+		auto self(shared_from_this());
+		boost::asio::async_write(socket_, boost::asio::buffer(data_, max_length),
+			[this, self](boost::system::error_code ec, std::size_t /*length*/)
+		{
+			if (!ec)
+			{
 				g_succeed_count++;
 				do_read();
 			}
