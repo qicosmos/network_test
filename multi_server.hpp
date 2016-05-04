@@ -14,7 +14,8 @@ public:
 
 	void run()
 	{
-		io_service_pool_.run();
+		thd_ = std::make_shared<std::thread>([this] {io_service_pool_.run(); });
+		//io_service_pool_.run();
 		//std::thread t([this] {io_service_pool_.run(); });
 		//t.detach();
 	}
@@ -37,5 +38,6 @@ private:
 	io_service_pool io_service_pool_;
 	tcp::acceptor acceptor_;
 	std::shared_ptr<connection> conn_;
+	std::shared_ptr<std::thread> thd_;
 };
 
