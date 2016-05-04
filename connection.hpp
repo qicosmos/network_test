@@ -2,22 +2,27 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <atomic>
 #include <boost/asio.hpp>
 #include "common.h"
 
 using boost::asio::ip::tcp;
 
-class session : public std::enable_shared_from_this<session>
+class connection : public std::enable_shared_from_this<connection>, private boost::noncopyable
 {
 public:
-	session(tcp::socket socket)
-		: socket_(std::move(socket))
+	connection(boost::asio::io_service& io_service) : socket_(io_service)
 	{
 	}
 
 	void start()
 	{
 		do_read();
+	}
+
+	tcp::socket& socket()
+	{
+		return socket_;
 	}
 
 private:
@@ -61,33 +66,5 @@ private:
 	tcp::socket socket_;
 	enum { max_length = 1 };
 	char data_[max_length];
-};
-
-class basic_server
-{
-public:
-	basic_server(boost::asio::io_service& io_service, short port)
-		: acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), socket_(io_service)
-	{
-		do_accept();
-	}
-
-private:
-	void do_accept()
-	{
-		acceptor_.async_accept(socket_,
-			[this](boost::system::error_code ec)
-		{
-			if (!ec)
-			{
-				std::make_shared<session>(std::move(socket_))->start();
-			}
-
-			do_accept();
-		});
-	}
-
-	tcp::acceptor acceptor_;
-	tcp::socket socket_;
 };
 

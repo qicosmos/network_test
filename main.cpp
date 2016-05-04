@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include "test_qps.hpp"
+#include "multi_server.hpp"
 
 //int main(int argc, char* argv[])
 //{
