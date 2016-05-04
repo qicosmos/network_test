@@ -14,8 +14,9 @@ public:
 
 	void run()
 	{
-		std::thread t([this] {io_service_pool_.run(); });
-		t.detach();
+		io_service_pool_.run();
+		//std::thread t([this] {io_service_pool_.run(); });
+		//t.detach();
 	}
 
 private:
