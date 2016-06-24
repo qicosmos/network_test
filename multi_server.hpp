@@ -1,6 +1,8 @@
 #pragma once
 #include "connection.hpp"
+#include "http_connection.hpp"
 #include "io_service_pool.hpp"
+using namespace cinatra;
 
 class multi_server : private boost::noncopyable
 {
@@ -23,7 +25,7 @@ public:
 private:
 	void do_accept()
 	{
-		conn_.reset(new connection(io_service_pool_.get_io_service()));
+		conn_.reset(new http_connection(io_service_pool_.get_io_service()));
 		acceptor_.async_accept(conn_->socket(), [this](boost::system::error_code ec)
 		{
 			if (!ec)
@@ -37,7 +39,7 @@ private:
 
 	io_service_pool io_service_pool_;
 	tcp::acceptor acceptor_;
-	std::shared_ptr<connection> conn_;
+	std::shared_ptr<http_connection> conn_;
 	std::shared_ptr<std::thread> thd_;
 };
 

@@ -37,7 +37,7 @@ TEST_CASE(test_multi_io_service)
 {
 	try
 	{
-		multi_server server(8090, std::thread::hardware_concurrency());
+		multi_server server(9000, std::thread::hardware_concurrency());
 		server.run();
 
 		getchar();
