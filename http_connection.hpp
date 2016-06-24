@@ -99,8 +99,8 @@ namespace cinatra {
 		void do_write()
 		{
 			boost::system::error_code ec;
-			boost::asio::write(socket_, boost::asio::buffer(str), ec);
-			//boost::asio::write(socket_, reply_.to_buffers(), ec);
+			//boost::asio::write(socket_, boost::asio::buffer(str), ec);
+			boost::asio::write(socket_, reply_.to_buffers(), ec);
 			if (!ec)
 			{
 				g_succeed_count++;
