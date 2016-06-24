@@ -94,34 +94,34 @@ namespace cinatra {
 
 		void do_write()
 		{
-			//boost::system::error_code ec;
-			//boost::asio::write(socket_, reply_.to_buffers(), ec);
-			//if (!ec)
-			//{
-			//	g_succeed_count++;
-			//	return;
-			//}
-
-			g_succeed_count++;
-			auto self(this->shared_from_this());
-			boost::asio::async_write(socket_, reply_.to_buffers(),
-				[this, self](boost::system::error_code ec, std::size_t)
+			boost::system::error_code ec;
+			boost::asio::write(socket_, reply_.to_buffers(), ec);
+			if (!ec)
 			{
-				if (!ec)
-				{
-					// Initiate graceful connection closure.
-					//boost::system::error_code ignored_ec;
-					//socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-					
-					return;
-				}
+				g_succeed_count++;
+				return;
+			}
 
-				if (ec != boost::asio::error::operation_aborted)
-				{
-					close();
-					//connection_manager_.stop(shared_from_this());
-				}
-			});
+			//g_succeed_count++;
+			//auto self(this->shared_from_this());
+			//boost::asio::async_write(socket_, reply_.to_buffers(),
+			//	[this, self](boost::system::error_code ec, std::size_t)
+			//{
+			//	if (!ec)
+			//	{
+			//		// Initiate graceful connection closure.
+			//		//boost::system::error_code ignored_ec;
+			//		//socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+			//		
+			//		return;
+			//	}
+
+			//	if (ec != boost::asio::error::operation_aborted)
+			//	{
+			//		close();
+			//		//connection_manager_.stop(shared_from_this());
+			//	}
+			//});
 		}
 
 		void reset_timer()
