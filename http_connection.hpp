@@ -4,7 +4,11 @@
 #include <boost/asio.hpp>
 #include "http_parser.hpp"
 #include "reply.hpp"
-
+std::string str = "HTTP/1.0 200 OK\r\n"
+"Content-Length: 4\r\n"
+"Content-Type: text/html\r\n"
+"Connection: Keep-Alive\r\n\r\n"
+"TEST";
 using boost::asio::ip::tcp;
 namespace cinatra {
 	class http_connection : public std::enable_shared_from_this<http_connection>, private boost::noncopyable
@@ -95,7 +99,8 @@ namespace cinatra {
 		void do_write()
 		{
 			boost::system::error_code ec;
-			boost::asio::write(socket_, reply_.to_buffers(), ec);
+			boost::asio::write(socket_, boost::asio::buffer(str), ec);
+			//boost::asio::write(socket_, reply_.to_buffers(), ec);
 			if (!ec)
 			{
 				g_succeed_count++;
