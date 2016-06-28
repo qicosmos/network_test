@@ -234,77 +234,59 @@ namespace stock_replies {
 } // namespace stock_replies
 
 /// A reply to be sent to a client.
-struct reply
+class reply
 {
-	reply() : ready_to_go(true)
-	{}
-	/// The status of the reply.
-
-
-	/// The headers to be included in the reply.
-	std::vector<header> headers;
-
-	/// The content to be sent in the reply.
-	std::string content;
-	status_type status;
-	/* if the reply is ready to send to client */
-	bool ready_to_go;
-
-	/* connected pair to signal the content is ready for delivery */
-	//std::shared_ptr<stream_protocol::socket> read_side;
-	//std::shared_ptr<stream_protocol::socket> write_side;
+public:
+	reply() = default;
 
 	/// Convert the reply into a vector of buffers. The buffers do not own the
 	/// underlying memory blocks, therefore the reply object must remain valid and
 	/// not be changed until the write operation has completed.
-	
-
 	std::vector<boost::asio::const_buffer> to_buffers()
 	{
 		std::vector<boost::asio::const_buffer> buffers;
-		buffers.push_back(status_strings::to_buffer(status));
-		for (std::size_t i = 0; i < headers.size(); ++i)
+		buffers.push_back(status_strings::to_buffer(status_));
+		for (std::size_t i = 0; i < headers_.size(); ++i)
 		{
-			header& h = headers[i];
+			header& h = headers_[i];
 			buffers.push_back(boost::asio::buffer(h.name));
 			buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
 			buffers.push_back(boost::asio::buffer(h.value));
 			buffers.push_back(boost::asio::buffer(misc_strings::crlf));
 		}
 		buffers.push_back(boost::asio::buffer(misc_strings::crlf));
-		buffers.push_back(boost::asio::buffer(content));
+		buffers.push_back(boost::asio::buffer(content_));
 		return buffers;
 	}
 
-	static reply stock_reply(status_type status, std::string content="")
+	static reply stock_reply(status_type status)
 	{
 		reply rep;
-		rep.status = status;
-		rep.content = content;
-		rep.headers.resize(3);
-		rep.headers[0].name = "Content-Length";
-		rep.headers[0].value = std::to_string(rep.content.size());
-		rep.headers[1].name = "Content-Type";
-		rep.headers[1].value = "text/html";
-		rep.headers.push_back({ "Connection", "Keep-Alive" });
+		rep.status_ = status;
+
+		rep.headers_.push_back({ "Content-Length", std::to_string(rep.content_.size()) });
+		rep.headers_.push_back({ "Content-Type", "text/html" });
+		//rep.headers_.push_back({ "Connection", "Keep-Alive" });
 
 		return rep;
 	}
 
-	void  handle_write(const boost::system::error_code& error, 	std::size_t bytes_transferred)
+	void set_content(const std::string& content)
 	{
-
+		content_ = content;
 	}
 
-	/// Get a stock reply.
-	void ready() {
-		//ready_to_go = true;
-		//if (write_side.get() && read_side.get() && write_side->is_open() && read_side->is_open()) {
-		//	write_side->async_write_some(boost::asio::buffer(&ready_to_go, sizeof(ready_to_go)),
-		//		boost::bind(&reply::handle_write, this,
-		//			boost::asio::placeholders::error,
-		//			boost::asio::placeholders::bytes_transferred));
-		//}
+	void set_content(std::string&& content)
+	{
+		content_ = std::move(content);
 	}
+
+private:
+	/// The headers to be included in the reply.
+	std::vector<header> headers_;
+
+	/// The content to be sent in the reply.
+	std::string content_;
+	status_type status_;
 };
 

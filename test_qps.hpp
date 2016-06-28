@@ -38,6 +38,8 @@ TEST_CASE(test_multi_io_service)
 	try
 	{
 		multi_server server(9000, std::thread::hardware_concurrency());
+		server.register_handler("/", [](auto const& req, auto& rep) { rep.set_content("hello world"); });
+		server.register_handler("/bench", [](auto const& req, auto& rep) { rep.set_content("TEST"); });
 		server.run();
 
 		getchar();

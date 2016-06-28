@@ -4,6 +4,8 @@
 #include <boost/asio.hpp>
 #include "http_parser.hpp"
 #include "reply.hpp"
+#include "dispatcher.hpp"
+
 std::string str = "HTTP/1.0 200 OK\r\n"
 "Content-Length: 4\r\n"
 "Content-Type: text/html\r\n"
@@ -15,7 +17,7 @@ namespace cinatra {
 	{
 	public:
 
-		http_connection(boost::asio::io_service& io_service) : socket_(io_service), timer_(io_service)
+		http_connection(boost::asio::io_service& io_service, dispatcher& dispatcher) : socket_(io_service), timer_(io_service), dispatcher_(dispatcher)
 		{
 		}
 
@@ -25,7 +27,7 @@ namespace cinatra {
 
 		void start()
 		{
-			do_read0();
+			do_read();
 		}
 
 		tcp::socket& socket()
@@ -33,7 +35,7 @@ namespace cinatra {
 			return socket_;
 		}
 	private:
-		void do_read0()
+		void do_read()
 		{
 			auto self(shared_from_this());
 			socket_.async_read_some(boost::asio::buffer(read_buffer_),
@@ -42,36 +44,14 @@ namespace cinatra {
 				if (!ec)
 				{
 					http_parser::result_type result;
-					std::tie(result, std::ignore) = request_parser_.parse(
-						request_, read_buffer_.begin(), read_buffer_.end());
+					std::tie(result, std::ignore) = request_parser_.parse(request_, read_buffer_.begin(), read_buffer_.end());
 
 					if (result == http_parser::good)
 					{
-						//dispatcher_.dispatch(request_, reply_);
-						if (reply_.ready_to_go) 
-						{
-							//if (request_.uri == "/bench")
-							reply_ = reply::stock_reply(status_type::ok, "TEST");
-							do_write();
-							request_parser_.reset();
-							do_read0();
-						}
-						else 
-						{
-							//if (reply_.read_side.get() == nullptr || !reply_.read_side->is_open() ||
-							//	reply_.write_side.get() == nullptr || !reply_.write_side->is_open()) {
-							//	reply_.read_side =
-							//		std::shared_ptr<stream_protocol::socket>(new stream_protocol::socket(socket_.get_io_service()));
-							//	reply_.write_side =
-							//		std::shared_ptr<stream_protocol::socket>(new stream_protocol::socket(socket_.get_io_service()));
-							//	boost::asio::local::connect_pair(*reply_.read_side, *reply_.write_side);
-							//}
-
-							//reply_.read_side->async_read_some(boost::asio::buffer(&reply_.ready_to_go, sizeof(reply_.ready_to_go)),
-							//	boost::bind(&connection::handle_ready_to_go, shared_from_this(),
-							//		boost::asio::placeholders::error,
-							//		boost::asio::placeholders::bytes_transferred));
-						}
+						dispatcher_.dispatch(request_, reply_);
+						do_write();
+						request_parser_.reset();
+						//do_read();
 					}
 					else if (result == http_parser::bad)
 					{
@@ -80,13 +60,13 @@ namespace cinatra {
 					}
 					else
 					{
-						do_read0();
+						do_read();
 					}
 				}
 				else if (ec != boost::asio::error::operation_aborted)
 				{
 					close();
-					//connection_manager_.stop(shared_from_this());
+					request_parser_.reset();
 				}
 			});
 		}
@@ -177,5 +157,6 @@ namespace cinatra {
 		http_parser request_parser_;
 		http_request request_;
 		reply reply_;
+		dispatcher& dispatcher_;
 	};
 }
