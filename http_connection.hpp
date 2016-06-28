@@ -43,8 +43,8 @@ namespace cinatra {
 			{
 				if (!ec)
 				{
-					http_parser::result_type result;
-					std::tie(result, std::ignore) = request_parser_.parse(request_, read_buffer_.begin(), read_buffer_.end());
+					http_parser::result_type result = http_parser::good;
+					//std::tie(result, std::ignore) = request_parser_.parse(request_, read_buffer_.begin(), read_buffer_.end());
 
 					if (result == http_parser::good)
 					{
