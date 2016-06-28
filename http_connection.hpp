@@ -172,7 +172,7 @@ namespace cinatra {
 		}
 	private:
 		tcp::socket socket_;
-		char read_buf_[106];
+		char read_buf_[111];
 		boost::asio::deadline_timer timer_;
 		std::size_t timeout_milli_;
 
