@@ -52,7 +52,7 @@ namespace cinatra {
 						reply_.set_content("hello world");
 						do_write();
 						request_parser_.reset();
-						//do_read();
+						do_read();
 					}
 					else if (result == http_parser::bad)
 					{
