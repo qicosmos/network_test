@@ -6,7 +6,7 @@
 #include "reply.hpp"
 #include "dispatcher.hpp"
 
-std::string str = "HTTP/1.0 200 OK\r\n"
+std::string g_str = "HTTP/1.0 200 OK\r\n"
 "Content-Length: 4\r\n"
 "Content-Type: text/html\r\n"
 "Connection: Keep-Alive\r\n\r\n"
@@ -27,6 +27,7 @@ namespace cinatra {
 
 		void start()
 		{
+			set_no_delay();
 			do_read();
 		}
 
@@ -38,20 +39,34 @@ namespace cinatra {
 		void do_read()
 		{
 			auto self(shared_from_this());
-			socket_.async_read_some(boost::asio::buffer(read_buffer_),
+			boost::asio::async_read(socket_, boost::asio::buffer(read_buf_),
 				[this, self](boost::system::error_code ec, std::size_t bytes_transferred)
 			{
 				if (!ec)
 				{
+					//boost::system::error_code ec;
+					//boost::asio::write(socket_, boost::asio::buffer(g_str), ec);
+					//do_read();
+
 					http_parser::result_type result = http_parser::good;
-					//std::tie(result, std::ignore) = request_parser_.parse(request_, read_buffer_.begin(), read_buffer_.end());
+					std::tie(result, std::ignore) = request_parser_.parse(request_, read_buf_, read_buf_ + bytes_transferred);
 
 					if (result == http_parser::good)
 					{
-						//dispatcher_.dispatch(request_, reply_);
+						dispatcher_.dispatch(request_, reply_);
 						//reply_.set_content("hello world");
-						do_write();
+						//do_write();
+						boost::system::error_code ec;
+						std::string str = "HTTP/1.0 200 OK\r\n"
+											"Content-Length: ";
+						str.append(std::to_string(4));
+						str += "Content-Type: text/html\r\n"
+							"Connection: Keep-Alive\r\n\r\n";
+						str.append("hello world");
+						//boost::asio::write(socket_, reply_.to_buffers(), ec);
+						boost::asio::write(socket_, boost::asio::buffer(str), ec);
 						request_parser_.reset();
+						do_read();
 					}
 					else if (result == http_parser::bad)
 					{
@@ -76,10 +91,17 @@ namespace cinatra {
 			do_write();
 		}
 
+		void set_no_delay()
+		{
+			boost::asio::ip::tcp::no_delay option(true);
+			boost::system::error_code ec;
+			socket_.set_option(option, ec);
+		}
+
 		void do_write()
 		{
 			boost::system::error_code ec;
-			//boost::asio::write(socket_, boost::asio::buffer(str), ec);
+			//boost::asio::write(socket_, boost::asio::buffer(g_str), ec);
 			boost::asio::write(socket_, reply_.to_buffers(), ec);
 			if (!ec)
 			{
@@ -150,7 +172,7 @@ namespace cinatra {
 		}
 	private:
 		tcp::socket socket_;
-		std::array<char, 8192> read_buffer_;
+		char read_buf_[106];
 		boost::asio::deadline_timer timer_;
 		std::size_t timeout_milli_;
 
