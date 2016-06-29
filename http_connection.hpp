@@ -48,7 +48,7 @@ namespace cinatra {
 					//boost::asio::write(socket_, boost::asio::buffer(g_str), ec);
 					//do_read();
 
-					http_parser::result_type result = http_parser::good;
+					http_parser::result_type result;
 					std::tie(result, std::ignore) = request_parser_.parse(request_, read_buf_, read_buf_ + bytes_transferred);
 
 					if (result == http_parser::good)
